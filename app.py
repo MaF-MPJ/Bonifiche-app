@@ -2,6 +2,8 @@ import streamlit as st
 import math
 from datetime import datetime
 import pandas as pd
+import numpy as np
+
 
 # Inietta il meta tag HTML per l'icona sui dispositivi mobili
 st.markdown(
@@ -82,15 +84,31 @@ if st.button("CALCOLA RISULTATI", type="primary"):
     else:
         st.write("**Stima a 1 m:** Attività non calcolabile (inserire cps > 0)")
 
-    # GRAFICO INTERATTIVO
-    st.subheader("📈 Andamento Spaziale del Rateo di Dose")
-    
-    # Generazione curva teorica 1/x
-    x_teorico = list(range(1, 101))
-    y_teorico = [100 * rDose100 / x for x in x_teorico]
-    
-    df_teorico = pd.DataFrame({"Distanza (cm)": x_teorico, "Teorico 1/x (nSv/h)": y_teorico})
-    df_teorico = df_teorico.set_index("Distanza (cm)")
-    
-    # Mostra grafico a linee fluido su smartphone
-    st.line_chart(df_teorico)
+# --- NUOVO GRAFICO INTEGRATO ---
+st.subheader("📈 Andamento Spaziale del Rateo di Dose")
+
+# 1. Mappatura dei punti misurati (già convertiti in nSv/h)
+# Associano la distanza (chiave) al rispettivo valore di dose
+# Per il contatto (0 cm) usiamo 1 cm per evitare la divisione per zero nel grafico
+punti_misurati = {}
+if cps0 > 0: punti_misurati[1] = rDose0
+if cps50 > 0: punti_misurati[50] = rDose50
+if cps100 > 0: punti_misurati[100] = rDose100
+
+# 2. Generazione asse X (Distanze da 1 a 100 cm)
+x_teorico = list(range(1, 101))
+
+# 3. Generazione delle serie di dati
+y_teorico = [rDose100 * (100 / x)**2 for x in x_teorico]
+y_misurato = [punti_misurati.get(x, np.nan) for x in x_teorico]
+
+# 4. Creazione del DataFrame per Streamlit
+df_grafico = pd.DataFrame({
+    "Distanza (cm)": x_teorico,
+    "Teorico 1/x² (nSv/h)": y_teorico,
+    "Misurato (nSv/h)": y_misurato
+})
+df_grafico = df_grafico.set_index("Distanza (cm)")
+
+# 5. Rendering del grafico a linee e punti
+st.line_chart(df_grafico)
