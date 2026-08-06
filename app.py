@@ -265,3 +265,18 @@ with col_wa:
     import urllib.parse
     testo_messaggio = (
         f"--- *REPORT RADIOPROTEZIONE* ---\n"
+        f"📅 Data: {datetime.now().strftime('%d/%m/%Y')}\n"
+        f"🔬 Radionuclide: {sel_rad}\n
+        "f"📈 Dose 1m: {rDose100:.2f} nSv/h\n
+        "f"📈 Dose 50cm: {rDose50:.2f} nSv/h\n
+        "f"📥 Scarica il PDF completo dall'applicazione."
+    )
+    testo_codificato = urllib.parse.quote(testo_messaggio)
+    link_whatsapp = f"wa.me{testo_codificato}"
+    
+    st.link_button(
+        label="💬 Condividi su WhatsApp",
+        url=link_whatsapp,
+        type="primary",
+        use_container_width=True
+    )
