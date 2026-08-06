@@ -41,7 +41,8 @@ idx_rad = radionuclidi.index(sel_rad)
 
 kTar = taratura[idx_det]
 kGamma = costanteGamma[idx_rad]
-tDim = tDimezzamento[idx_rad] * 24 * 3600
+emivita_giorni = tDimezzamento[idx_rad]
+tDim = emivita_giorni * 24 * 3600
 
 data_bonifica = st.date_input("Data bonifica:", datetime.now())
 
@@ -61,13 +62,19 @@ dStart_ts = datetime.combine(data_bonifica, datetime.min.time()).timestamp()
 date50 = "N/D"
 date100 = "N/D"
 
-if valAtt50 > 0:
-    outData50 = (tDim / math.log(2)) * math.log(valAtt50 * 1e3)
-    date50 = datetime.fromtimestamp(dStart_ts + outData50).strftime("%d/%m/%Y")
-
-if valAtt100 > 0:
-    outData100 = (tDim / math.log(2)) * math.log(valAtt100 * 1e3)
-    date100 = datetime.fromtimestamp(dStart_ts + outData100).strftime("%d/%m/%Y")
+# Controllo robustezza per radionuclidi a emivita lunga (> 10 anni / 3650 giorni)
+if emivita_giorni > 3650:
+    if valAtt50 > 0:
+        date50 = "Non applicabile (emivita > 10 anni)"
+    if valAtt100 > 0:
+        date100 = "Non applicabile (emivita > 10 anni)"
+else:
+    if valAtt50 > 0:
+        outData50 = (tDim / math.log(2)) * math.log(valAtt50 * 1e3)
+        date50 = datetime.fromtimestamp(dStart_ts + outData50).strftime("%d/%m/%Y")
+    if valAtt100 > 0:
+        outData100 = (tDim / math.log(2)) * math.log(valAtt100 * 1e3)
+        date100 = datetime.fromtimestamp(dStart_ts + outData100).strftime("%d/%m/%Y")
 
 if st.button("CALCOLA RISULTATI", type="primary"):
     st.success("### 📊 Risultati Rateo di Dose")
