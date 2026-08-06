@@ -84,7 +84,7 @@ if st.button("CALCOLA RISULTATI", type="primary"):
     else:
         st.write("**Stima a 1 m:** Attività non calcolabile (inserire cps > 0)")
 
-# --- NUOVO GRAFICO INTEGRATO ---
+# --- GRAFICO INTERATTIVO AGGIORNATO ---
 st.subheader("📈 Andamento Spaziale del Rateo di Dose")
 
 # 1. Mappatura dei punti misurati (già convertiti in nSv/h)
