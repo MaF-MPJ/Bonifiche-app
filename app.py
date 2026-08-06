@@ -3,6 +3,16 @@ import math
 from datetime import datetime
 import pandas as pd
 
+# Inietta il meta tag HTML per l'icona sui dispositivi mobili
+st.markdown(
+    """
+    <head>
+        <link rel="apple-touch-icon" href="https://tuosito.com">
+        <link rel="icon" sizes="192x192" href="https://tuosito.com">
+    </head>
+    """,
+    unsafe_allow_html=True
+)
 # Configurazione Schermata Mobile-Friendly
 st.set_page_config(page_title="Radioprotezione App", page_icon="☢️", layout="centered")
 
