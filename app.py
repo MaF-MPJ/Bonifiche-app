@@ -126,3 +126,39 @@ grafico_finale = alt.layer(linea_teorica, punti_misurati).interactive()
 
 # 4. Rendering su Streamlit
 st.altair_chart(grafico_finale, use_container_width=True)
+# --- TABELLA DI SCOSTAMENTO PERCENTUALE ---
+if cps50 > 0 and cps100 > 0:
+    st.subheader("📊 Analisi di Coerenza della Misura")
+    
+    # 1. Calcolo del valore teorico atteso a 50 cm basandosi sul valore a 100 cm
+    dose_teorica_50 = rDose100 * (100 / 50)**2
+    
+    # 2. Calcolo dello scostamento percentuale
+    scostamento_perc = ((rDose50 - dose_teorica_50) / dose_teorica_50) * 100
+    
+    # 3. Creazione del DataFrame per la visualizzazione a tabella
+    dati_confronto = {
+        "Parametro a 50 cm": [
+            "Rateo di Dose Misurato (nSv/h)", 
+            "Rateo di Dose Teorico Atteso (nSv/h)", 
+            "Scostamento Percentuale (%)"
+        ],
+        "Valore": [
+            f"{rDose50:.2f}",
+            f"{dose_teorica_50:.2f}",
+            f"{scostamento_perc:+.1f}%"  # Mostra esplicitamente il segno + o -
+        ]
+    }
+    df_confronto = pd.DataFrame(dati_confronto)
+    
+    # 4. Rendering della tabella pulita
+    st.table(df_confronto)
+    
+    # 5. Feedback testuale dinamico in base all'entità dell'errore
+    if abs(scostamento_perc) <= 10:
+        st.success("✅ **Ottima coerenza fisica**: Lo scostamento è inferiore al 10%. La sorgente si comporta come un punto geometrico ideale.")
+    elif abs(scostamento_perc) <= 25:
+        st.warning("⚠️ **Scostamento moderato**: Differenza tra il 10% e il 25%. Verificare la geometria di misura o possibili radiazioni diffuse.")
+    else:
+        st.error("🚨 **Scostamento elevato**: Differenza superiore al 25%. Possibile presenza di schermature parziali, sorgente estesa o errore strumentale.")
+
