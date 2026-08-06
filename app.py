@@ -25,14 +25,24 @@ st.markdown(
 st.set_page_config(page_title="Radioprotezione App", page_icon="☢️", layout="centered")
 st.title("☢️ Calcoli di Radioprotezione")
 
+# Elenchi strumentazione e tecnici
 detectors = ["RE-55916", "RE-53065", "RE-53154", "RE-53049", "RE-55049", "RE-54722", "RE-56510", "RE-52083PD", "T98-3822", "T98-3914", "T98-8043", "Default"]
 taratura = [0.577, 0.631, 0.613, 0.609, 0.588, 0.598, 0.667, 0.514, 0.612, 0.523, 0.523, 0.602]
 
+# Lista dei tecnici (puoi modificare i nomi all'interno di questo array)
+tecnici = ["Andrea Colli", "Andrea Giliberto", "Davide Concion", "Stefano Bignolini", "Altro / Operatore"]
+
 radionuclidi = ["I-131", "I-123", "Tc-99m", "Lu-177", "Lu-177m", "Ra-226", "NORM", "Th-232+", "K-40", "Cs-137", "Co-60", "Kr-85", "In-111", "Ir-192"]
 costanteGamma = [77.0, 74.8, 33.2, 7.64, 211.0, 258.0, 316.0, 864.0, 22.2, 104.0, 373.0, 0.426, 136.0, 161.0]
-tDimezzamento = [8.02, 0.551, 0.25, 6.65, 160.0, 584000.0, 1.63e12, 5.12e12, 4.56e11, 10964.0, 1925.23, 3927.08, 2.805, 73.83]
+tDimezzamento = [8.02, 0.551, 0.25, 6.65, 160.0, 584000.0, 1.63e12, 5.12e12, 4.56e11, 11000.0, 19200.0, 3920.0, 2.81, 73.8]
 
-st.subheader("Configurazione Parametri")
+# NUOVA SEZIONE: IDENTIFICAZIONE INTERVENTO
+st.subheader("📋 Dati Identificativi Intervento")
+sel_tecnico = st.selectbox("Tecnico Operatore:", tecnici)
+targa_veicolo = st.text_input("Targa Veicolo:", placeholder="Es. AA123BB").upper()
+desc_reperto = st.text_area("Descrizione Reperto Rilevato:", placeholder="Descrivere brevemente la tipologia e la collocazione del materiale...")
+
+st.subheader("⚙️ Configurazione Parametri")
 sel_det = st.selectbox("Seleziona Detector:", detectors)
 sel_rad = st.selectbox("Seleziona Radionuclide:", radionuclidi)
 
@@ -62,12 +72,9 @@ dStart_ts = datetime.combine(data_bonifica, datetime.min.time()).timestamp()
 date50 = "N/D"
 date100 = "N/D"
 
-# Controllo robustezza per radionuclidi a emivita lunga (> 10 anni / 3650 giorni)
 if emivita_giorni > 3650:
-    if valAtt50 > 0:
-        date50 = "Non applicabile (emivita > 10 anni)"
-    if valAtt100 > 0:
-        date100 = "Non applicabile (emivita > 10 anni)"
+    if valAtt50 > 0: date50 = "Non applicabile (emivita > 10 anni)"
+    if valAtt100 > 0: date100 = "Non applicabile (emivita > 10 anni)"
 else:
     if valAtt50 > 0:
         outData50 = (tDim / math.log(2)) * math.log(valAtt50 * 1e3)
@@ -185,8 +192,15 @@ def genera_pdf_bytes():
     elementi.append(Paragraph(f"Generato il: {datetime.now().strftime('%d/%m/%Y alle %H:%M')}", stile_sottotitolo))
     elementi.append(Spacer(1, 15))
     
-    elementi.append(Paragraph("<b>1. Configurazione Parametri</b>", stile_sezione))
+    # Sezione 1 aggiornata con i dati descrittivi dell'intervento
+    elementi.append(Paragraph("<b>1. Dati Intervento e Configurazione Parametri</b>", stile_sezione))
+    targa_output = targa_veicolo if targa_veicolo else "N/D"
+    desc_output = desc_reperto if desc_reperto else "Nessuna descrizione inserita."
+    
     info_parametri = (
+        f"<b>Operatore Tecnico:</b> {sel_tecnico}<br/>"
+        f"<b>Targa Veicolo Bonificato:</b> {targa_output}<br/>"
+        f"<b>Descrizione Reperto:</b> {desc_output}<br/><br/>"
         f"<b>Detector Selezionato:</b> {sel_det} (Fattore Taratura kTar: {kTar})<br/>"
         f"<b>Radionuclide Selezionato:</b> {sel_rad} (Costante Gamma: {kGamma}, Dimezzamento: {tDimezzamento[idx_rad]} giorni)<br/>"
         f"<b>Data di riferimento bonifica:</b> {data_bonifica.strftime('%d/%m/%Y')}"
