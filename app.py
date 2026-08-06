@@ -144,7 +144,7 @@ st.altair_chart(grafico_finale, use_container_width=True)
 
 # --- TABELLA DI SCOSTAMENTO PERCENTUALE ---
 if cps50 > 0 and cps100 > 0:
-    st.subheader("📊 Analisi di Coherence della Misura")
+    st.subheader("📊 Analisi di Coerenza della Misura")
     dose_teorica_50 = rDose100 * (100 / 50)**2
     scostamento_perc = ((rDose50 - dose_teorica_50) / dose_teorica_50) * 100
     
@@ -255,33 +255,6 @@ def genera_pdf_bytes():
     buffer.seek(0)
     return buffer.getvalue()
 
-# --- TABELLA DI SCOSTAMENTO PERCENTUALE ---
-if cps50 > 0 and cps100 > 0:
-    st.subheader("📊 Analisi di Coerenza della Misura")
-    dose_teorica_50 = rDose100 * (100 / 50)**2
-    scostamento_perc = ((rDose50 - dose_teorica_50) / dose_teorica_50) * 100
-    
-    dati_confronto = {
-        "Parametro a 50 cm": [
-            "Rateo di Dose Misurato (nSv/h)", 
-            "Rateo di Dose Teorico Atteso (nSv/h)", 
-            "Scostamento Percentuale (%)"
-        ],
-        "Valore": [
-            f"{rDose50:.2f}",
-            f"{dose_teorica_50:.2f}",
-            f"{scostamento_perc:+.1f}%"
-        ]
-    }
-    df_confronto = pd.DataFrame(dati_confronto)
-    st.table(df_confronto)
-    
-    if abs(scostamento_perc) <= 10:
-        st.success("✅ **Ottima coerenza fisica**: Lo scostamento è inferiore al 10%. La sorgente si comporta come un punto geometrico ideale.")
-    elif abs(scostamento_perc) <= 25:
-        st.warning("⚠️ **Scostamento moderato**: Differenza tra il 10% e il 25%. Verificare la geometria di misura o possibili radiazioni diffuse.")
-    else:
-        st.error("🚨 **Scostamento elevato**: Differenza superiore al 25%. Possibile presenza di schermature parziali, sorgente estesa o errore strumentale.")
 
 # --- SEZIONE GENERAZIONE REPORT PDF (Ora è fuori dall'if, allineata a sinistra) ---
 st.subheader("📄 Esportazione Report")
@@ -359,7 +332,7 @@ def genera_pdf_bytes():
         
     elementi.append(Paragraph(testo_smaltimento, stile_testo))
     elementi.append(Spacer(1, 40))
-    elementi.append(Paragraph("___________________________<br/><i>Firma dell'Operatore Esperto</i>", stile_testo))
+    elementi.append(Paragraph("___________________________<br/><i>Firma dell'Esperto di Radioprotezione</i>", stile_testo))
     
     elementi.append(Spacer(1, 30))
     elementi.append(Paragraph("<font size=8 color=gray>This is for informational purposes only. For medical advice or diagnosis, consult a professional. AI responses may include mistakes.</font>", stile_sottotitolo))
