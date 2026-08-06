@@ -4,7 +4,6 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-
 # Inietta il meta tag HTML per l'icona sui dispositivi mobili
 st.markdown(
     """
@@ -15,7 +14,9 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-# Configurazione Schermata Mobile-Friendly
+
+# NOTA: st.set_page_config DEVE essere la primissima istruzione Streamlit eseguita.
+# Spostata qui in alto per evitare potenziali avvisi/errori di Streamlit.
 st.set_page_config(page_title="Radioprotezione App", page_icon="☢️", layout="centered")
 
 st.title("☢️ Calcoli di Radioprotezione")
@@ -47,14 +48,15 @@ cps0 = st.number_input("cps a contatto:", min_value=0.0, value=0.0)
 cps50 = st.number_input("cps a 50 cm:", min_value=0.0, value=0.0)
 cps100 = st.number_input("cps a 1m:", min_value=0.0, value=0.0)
 
+# --- CALCOLI FISSI (Eseguiti sempre per popolare il grafico in tempo reale) ---
+rDose0 = cps0 * kTar
+rDose50 = cps50 * kTar
+rDose100 = cps100 * kTar
+
+valAtt50 = (rDose50 / kGamma) * (0.5 ** 2) if kGamma > 0 else 0.0
+valAtt100 = (rDose100 / kGamma) if kGamma > 0 else 0.0
+
 if st.button("CALCOLA RISULTATI", type="primary"):
-    rDose0 = cps0 * kTar
-    rDose50 = cps50 * kTar
-    rDose100 = cps100 * kTar
-    
-    valAtt50 = (rDose50 / kGamma) * (0.5 ** 2)
-    valAtt100 = rDose100 / kGamma
-    
     # OUTPUT DATI
     st.success("### 📊 Risultati Rateo di Dose")
     st.write(f"**Rateo di dose a contatto:** {rDose0:.2f} nSv/h")
@@ -88,10 +90,8 @@ if st.button("CALCOLA RISULTATI", type="primary"):
 st.subheader("📈 Andamento Spaziale del Rateo di Dose")
 
 # 1. Mappatura dei punti misurati (già convertiti in nSv/h)
-# Associano la distanza (chiave) al rispettivo valore di dose
-# Per il contatto (0 cm) usiamo 1 cm per evitare la divisione per zero nel grafico
 punti_misurati = {}
-if cps0 > 0: punti_misurati[1] = rDose0
+if cps0 > 0: punti_misurati[1] = rDose0  # Mappato a 1 cm per evitare divisione per zero
 if cps50 > 0: punti_misurati[50] = rDose50
 if cps100 > 0: punti_misurati[100] = rDose100
 
