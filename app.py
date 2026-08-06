@@ -4,6 +4,14 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 import altair as alt
+import io
+import urllib.parse
+
+# --- RIGHE DI IMPORTAZIONE PER IL PDF ---
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
 
 # Inietta il meta tag HTML per l'icona sui dispositivi mobili
 st.markdown(
@@ -250,7 +258,6 @@ def genera_pdf_bytes():
 col_pdf, col_wa = st.columns(2)
 
 with col_pdf:
-    import io # Assicura che io sia disponibile
     pdf_data = genera_pdf_bytes()
     st.download_button(
         label="📥 Scarica Report PDF",
@@ -262,8 +269,7 @@ with col_pdf:
     )
 
 with col_wa:
-    import urllib.parse
-    testo_messaggio = (
+        testo_messaggio = (
         f"--- *REPORT RADIOPROTEZIONE* ---\n"
         f"📅 Data: {datetime.now().strftime('%d/%m/%Y')}\n"
         f"🔬 Radionuclide: {sel_rad}\n"
