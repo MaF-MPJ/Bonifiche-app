@@ -269,24 +269,44 @@ with col_pdf:
     )
 
 with col_wa:
-    # Messaggio riassuntivo formattato
+    # 1. Definizione del messaggio di testo pulito
     testo_messaggio = (
-        f"--- REPORT RADIOPROTEZIONE ---\n"
+        "--- REPORT RADIOPROTEZIONE ---\n"
         f"Data: {datetime.now().strftime('%d/%m/%Y')}\n"
         f"Radionuclide: {sel_rad}\n"
         f"Dose 1m: {rDose100:.2f} nSv/h\n"
         f"Dose 50cm: {rDose50:.2f} nSv/h\n"
-        f"Scarica il PDF completo dall'applicazione."
+        "Scarica il PDF completo dall'applicazione."
     )
-    # Codifica sicura per i browser
-    testo_codificato = urllib.parse.quote(testo_messaggio)
     
-    # URL ufficiale API che evita il blocco "about:blank#blocked"
+    # 2. Codifica sicura dei caratteri speciali per l'URL
+    testo_codificato = urllib.parse.quote(testo_messaggio)
     link_whatsapp = f"https://whatsapp.com{testo_codificato}"
     
-    st.link_button(
-        label="💬 Condividi su WhatsApp",
-        url=link_whatsapp,
-        type="primary",
-        use_container_width=True
+    # 3. Iniezione di un pulsante HTML personalizzato con sblocco di sicurezza per iFrame
+    st.markdown(
+        f"""
+        <a href="{link_whatsapp}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+            <button style="
+                width: 100%;
+                background-color: #ff4b4b;
+                color: white;
+                border: none;
+                padding: 10px 24px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                font-weight: 500;
+                border-radius: 8px;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                transition: background-color 0.3s ease;
+                margin-top: 4px;
+            ">
+                💬 Condividi su WhatsApp
+            </button>
+        </a>
+        """,
+        unsafe_allow_html=True
     )
