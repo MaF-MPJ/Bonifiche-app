@@ -90,18 +90,29 @@ if st.button("CALCOLA RISULTATI", type="primary"):
 # --- GRAFICO INTERATTIVO AGGIORNATO ---
 st.subheader("📈 Andamento Spaziale del Rateo di Dose")
 
-# 1. Generazione della curva teorica (da 2 a 100 cm per una migliore resa visiva dell'asse Y)
+# Nuova opzione per scegliere il tipo di scala sull'asse verticale
+tipo_scala = st.radio(
+    "Seleziona scala asse verticale (Y):",
+    options=["Lineare", "Logaritmica"],
+    index=0,
+    horizontal=True
+)
+
+# Mappatura della scelta per Altair
+scale_type = "linear" if tipo_scala == "Lineare" else "log"
+
+# 1. Generazione della curva teorica (da 2 a 100 cm)
 x_teorico = list(range(2, 101))
 y_teorico = [rDose100 * (100 / x)**2 for x in x_teorico]
 df_teorica = pd.DataFrame({"Distanza (cm)": x_teorico, "Rateo di Dose (nSv/h)": y_teorico})
 
-# Creazione del grafico a linee per la teoria (colore Blu)
+# Creazione del grafico a linee per la teoria
 linea_teorica = alt.Chart(df_teorica).mark_line(color="#1f77b4", strokeWidth=2.5).encode(
-    x=alt.X("Distanza (cm):Q", scale=alt.Scale(domain=[0, 100])),
-    y="Rateo di Dose (nSv/h):Q"
+    x=alt.X("Distanza (cm):Q", scale=alt.Scale(domain=[2, 100])),
+    y=alt.Y("Rateo di Dose (nSv/h):Q", scale=alt.Scale(type=scale_type))
 )
 
-# 2. Generazione della serie dei soli punti misurati a distanze fisse (escluso contatto)
+# 2. Generazione della serie dei soli punti misurati (escluso contatto)
 distanze_reali = []
 dosi_reali = []
 
@@ -114,51 +125,16 @@ if cps100 > 0:
 
 df_misure = pd.DataFrame({"Distanza (cm)": distanze_reali, "Rateo di Dose (nSv/h)": dosi_reali})
 
-# Creazione dei punti grafici per le misure (Cerchi Arancioni Grandi)
+# Creazione dei punti grafici per le misure (Cerchi Arancioni)
 punti_misurati = alt.Chart(df_misure).mark_circle(size=140, color="#ff7f0e", opacity=1.0).encode(
     x="Distanza (cm):Q",
-    y="Rateo di Dose (nSv/h):Q",
-    tooltip=["Distanza (cm)", "Rateo di Dose (nSv/h)"] # Mostra i valori esatti al passaggio del mouse
+    y=alt.Y("Rateo di Dose (nSv/h):Q", scale=alt.Scale(type=scale_type)),
+    tooltip=["Distanza (cm)", "Rateo di Dose (nSv/h)"]
 )
 
-# 3. Sovrapposizione dei due grafici nello stesso riquadro
+# 3. Sovrapposizione dei grafici e abilitazione dello zoom interattivo
+# L'utente può usare la rotellina del mouse o il pinch-to-zoom sullo smartphone per scalare gli assi
 grafico_finale = alt.layer(linea_teorica, punti_misurati).interactive()
 
 # 4. Rendering su Streamlit
 st.altair_chart(grafico_finale, use_container_width=True)
-# --- TABELLA DI SCOSTAMENTO PERCENTUALE ---
-if cps50 > 0 and cps100 > 0:
-    st.subheader("📊 Analisi di Coerenza della Misura")
-    
-    # 1. Calcolo del valore teorico atteso a 50 cm basandosi sul valore a 100 cm
-    dose_teorica_50 = rDose100 * (100 / 50)**2
-    
-    # 2. Calcolo dello scostamento percentuale
-    scostamento_perc = ((rDose50 - dose_teorica_50) / dose_teorica_50) * 100
-    
-    # 3. Creazione del DataFrame per la visualizzazione a tabella
-    dati_confronto = {
-        "Parametro a 50 cm": [
-            "Rateo di Dose Misurato (nSv/h)", 
-            "Rateo di Dose Teorico Atteso (nSv/h)", 
-            "Scostamento Percentuale (%)"
-        ],
-        "Valore": [
-            f"{rDose50:.2f}",
-            f"{dose_teorica_50:.2f}",
-            f"{scostamento_perc:+.1f}%"  # Mostra esplicitamente il segno + o -
-        ]
-    }
-    df_confronto = pd.DataFrame(dati_confronto)
-    
-    # 4. Rendering della tabella pulita
-    st.table(df_confronto)
-    
-    # 5. Feedback testuale dinamico in base all'entità dell'errore
-    if abs(scostamento_perc) <= 10:
-        st.success("✅ **Ottima coerenza fisica**: Lo scostamento è inferiore al 10%. La sorgente si comporta come un punto geometrico ideale.")
-    elif abs(scostamento_perc) <= 25:
-        st.warning("⚠️ **Scostamento moderato**: Differenza tra il 10% e il 25%. Verificare la geometria di misura o possibili radiazioni diffuse.")
-    else:
-        st.error("🚨 **Scostamento elevato**: Differenza superiore al 25%. Possibile presenza di schermature parziali, sorgente estesa o errore strumentale.")
-
