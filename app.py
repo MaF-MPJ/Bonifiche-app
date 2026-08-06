@@ -255,58 +255,132 @@ def genera_pdf_bytes():
     buffer.seek(0)
     return buffer.getvalue()
 
-col_pdf, col_wa = st.columns(2)
+# --- TABELLA DI SCOSTAMENTO PERCENTUALE ---
+if cps50 > 0 and cps100 > 0:
+    st.subheader("📊 Analisi di Coerenza della Misura")
+    dose_teorica_50 = rDose100 * (100 / 50)**2
+    scostamento_perc = ((rDose50 - dose_teorica_50) / dose_teorica_50) * 100
+    
+    dati_confronto = {
+        "Parametro a 50 cm": [
+            "Rateo di Dose Misurato (nSv/h)", 
+            "Rateo di Dose Teorico Atteso (nSv/h)", 
+            "Scostamento Percentuale (%)"
+        ],
+        "Valore": [
+            f"{rDose50:.2f}",
+            f"{dose_teorica_50:.2f}",
+            f"{scostamento_perc:+.1f}%"
+        ]
+    }
+    df_confronto = pd.DataFrame(dati_confronto)
+    st.table(df_confronto)
+    
+    if abs(scostamento_perc) <= 10:
+        st.success("✅ **Ottima coerenza fisica**: Lo scostamento è inferiore al 10%. La sorgente si comporta come un punto geometrico ideale.")
+    elif abs(scostamento_perc) <= 25:
+        st.warning("⚠️ **Scostamento moderato**: Differenza tra il 10% e il 25%. Verificare la geometria di misura o possibili radiazioni diffuse.")
+    else:
+        st.error("🚨 **Scostamento elevato**: Differenza superiore al 25%. Possibile presenza di schermature parziali, sorgente estesa o errore strumentale.")
 
-with col_pdf:
-    pdf_data = genera_pdf_bytes()
-    st.download_button(
-        label="📥 Scarica Report PDF",
-        data=pdf_data,
-        file_name=f"Report_Radioprotezione_{datetime.now().strftime('%Y%m%d')}.pdf",
-        mime="application/pdf",
-        type="secondary",
-        use_container_width=True
-    )
+# --- SEZIONE GENERAZIONE REPORT PDF (Ora è fuori dall'if, allineata a sinistra) ---
+st.subheader("📄 Esportazione Report")
 
-with col_wa:
-    # 1. Definizione del messaggio di testo pulito
-    testo_messaggio = (
-        "--- REPORT RADIOPROTEZIONE ---\n"
-        f"Data: {datetime.now().strftime('%d/%m/%Y')}\n"
-        f"Radionuclide: {sel_rad}\n"
-        f"Dose 1m: {rDose100:.2f} nSv/h\n"
-        f"Dose 50cm: {rDose50:.2f} nSv/h\n"
-        "Scarica il PDF completo dall'applicazione."
+def genera_pdf_bytes():
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=letter,
+        rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40,
+        title="Report Radioprotezione"
     )
     
-    # 2. Codifica sicura dei caratteri speciali per l'URL
-    testo_codificato = urllib.parse.quote(testo_messaggio)
-    link_whatsapp = f"https://whatsapp.com{testo_codificato}"
+    styles = getSampleStyleSheet()
+    stile_titolo = ParagraphStyle('TitoloPDF', parent=styles['Heading1'], fontSize=22, leading=26, textColor=colors.HexColor("#1f77b4"), alignment=1)
+    stile_sottotitolo = ParagraphStyle('SubPDF', parent=styles['Normal'], fontSize=10, leading=14, textColor=colors.gray, alignment=1)
+    stile_sezione = ParagraphStyle('SezPDF', parent=styles['Heading2'], fontSize=14, leading=18, textColor=colors.HexColor("#2c3e50"), spaceBefore=15, spaceAfter=8)
+    stile_testo = ParagraphStyle('TestoPDF', parent=styles['Normal'], fontSize=11, leading=16, textColor=colors.HexColor("#333333"))
+    stile_tabella_header = ParagraphStyle('TabHead', parent=styles['Normal'], fontSize=10, leading=12, textColor=colors.white, fontName="Helvetica-Bold")
+    stile_tabella_testo = ParagraphStyle('TabTxt', parent=styles['Normal'], fontSize=10, leading=12, textColor=colors.HexColor("#333333"))
+
+    elementi = []
+    elementi.append(Paragraph("<b>REPORT DI RADIOPROTEZIONE</b>", stile_titolo))
+    elementi.append(Paragraph(f"Generato il: {datetime.now().strftime('%d/%m/%Y alle %H:%M')}", stile_sottotitolo))
+    elementi.append(Spacer(1, 15))
     
-    # 3. Iniezione di un pulsante HTML personalizzato con sblocco di sicurezza per iFrame
-    st.markdown(
-        f"""
-        <a href="{link_whatsapp}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
-            <button style="
-                width: 100%;
-                background-color: #ff4b4b;
-                color: white;
-                border: none;
-                padding: 10px 24px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                font-weight: 500;
-                border-radius: 8px;
-                cursor: pointer;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                transition: background-color 0.3s ease;
-                margin-top: 4px;
-            ">
-                💬 Condividi su WhatsApp
-            </button>
-        </a>
-        """,
-        unsafe_allow_html=True
+    elementi.append(Paragraph("<b>1. Configurazione Parametri</b>", stile_sezione))
+    info_parametri = (
+        f"<b>Detector Selezionato:</b> {sel_det} (Fattore Taratura kTar: {kTar})<br/>"
+        f"<b>Radionuclide Selezionato:</b> {sel_rad} (Costante Gamma: {kGamma}, Dimezzamento: {tDimezzamento[idx_rad]} giorni)<br/>"
+        f"<b>Data di riferimento bonifica:</b> {data_bonifica.strftime('%d/%m/%Y')}"
     )
+    elementi.append(Paragraph(info_parametri, stile_testo))
+    elementi.append(Spacer(1, 10))
+    
+    elementi.append(Paragraph("<b>2. Risultati Rateo di Dose</b>", stile_sezione))
+    intestazioni = [Paragraph("<b>Posizione Misura</b>", stile_tabella_header), 
+                    Paragraph("<b>Valore Inserito (cps)</b>", stile_tabella_header), 
+                    Paragraph("<b>Rateo di Dose (nSv/h)</b>", stile_tabella_header)]
+    
+    riga0 = [Paragraph("A contatto (1 cm)", stile_tabella_testo), Paragraph(f"{cps0:.1f}", stile_tabella_testo), Paragraph(f"{rDose0:.2f}", stile_tabella_testo)]
+    riga50 = [Paragraph("A 50 cm", stile_tabella_testo), Paragraph(f"{cps50:.1f}", stile_tabella_testo), Paragraph(f"{rDose50:.2f}", stile_tabella_testo)]
+    riga100 = [Paragraph("A 1 metro", stile_tabella_testo), Paragraph(f"{cps100:.1f}", stile_tabella_testo), Paragraph(f"{rDose100:.2f}", stile_tabella_testo)]
+    
+    dati_tabella = [intestazioni, riga0, riga50, riga100]
+    t = Table(dati_tabella, colWidths=)
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#1f77b4")),
+        ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#dddddd")),
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor("#f9f9f9")]),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+        ('TOPPADDING', (0,0), (-1,-1), 6),
+    ]))
+    elementi.append(t)
+    elementi.append(Spacer(1, 15))
+    
+    elementi.append(Paragraph("<b>3. Analisi e Stime di Smaltimento</b>", stile_sezione))
+    testo_smaltimento = ""
+    if valAtt50 > 0:
+        testo_smaltimento += f"• <b>Stima a 50 cm:</b> Attività calcolata pari a <b>{valAtt50:.4g} MBq</b>. Data prevista per il conferimento/smaltimento: <b>{date50}</b>.<br/>"
+    else:
+        testo_smaltimento += "• <b>Stima a 50 cm:</b> Attività non calcolabile (misure assenti o pari a zero).<br/>"
+        
+    if valAtt100 > 0:
+        testo_smaltimento += f"• <b>Stima a 1 metro:</b> Attività calcolata pari a <b>{valAtt100:.4g} MBq</b>. Data prevista per il conferimento/smaltimento: <b>{date100}</b>.<br/>"
+    else:
+        testo_smaltimento += "• <b>Stima a 1 metro:</b> Attività non calcolabile (misure assenti o pari a zero).<br/>"
+        
+    if cps50 > 0 and cps100 > 0:
+        dose_teorica_50 = rDose100 * (100 / 50)**2
+        scostamento_perc = ((rDose50 - dose_teorica_50) / dose_teorica_50) * 100
+        testo_smaltimento += f"<br/>• <b>Coerenza della misura:</b> Lo scostamento geometrico calcolato a 50 cm rispetto alla legge dell'inverso del quadrato è pari a <b>{scostamento_perc:+.1f}%</b>.<br/>"
+        
+    elementi.append(Paragraph(testo_smaltimento, stile_testo))
+    elementi.append(Spacer(1, 40))
+    elementi.append(Paragraph("___________________________<br/><i>Firma dell'Operatore Esperto</i>", stile_testo))
+    
+    elementi.append(Spacer(1, 30))
+    elementi.append(Paragraph("<font size=8 color=gray>This is for informational purposes only. For medical advice or diagnosis, consult a professional. AI responses may include mistakes.</font>", stile_sottotitolo))
+    
+    doc.build(elementi)
+    buffer.seek(0)
+    return buffer.getvalue()
+
+# Generazione dei dati del PDF e pulsante a tutta larghezza
+pdf_data = genera_pdf_bytes()
+st.download_button(
+    label="📥 Scarica Report PDF Stampabile",
+    data=pdf_data,
+    file_name=f"Report_Radioprotezione_{datetime.now().strftime('%Y%m%d')}.pdf",
+    mime="application/pdf",
+    type="primary",
+    use_container_width=True
+)
+
+st.caption(
+    "💡 **Nota operativa:** Una volta scaricato, puoi inviare il file PDF "
+    "su **WhatsApp** aprendo la chat desiderata, toccando l'icona dell'allegato "
+    "(la graffetta o il tasto +) e selezionando il documento dalla cartella Download."
+)
