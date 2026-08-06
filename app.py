@@ -327,7 +327,7 @@ def genera_pdf_bytes():
     riga100 = [Paragraph("A 1 metro", stile_tabella_testo), Paragraph(f"{cps100:.1f}", stile_tabella_testo), Paragraph(f"{rDose100:.2f}", stile_tabella_testo)]
     
     dati_tabella = [intestazioni, riga0, riga50, riga100]
-    t = Table(dati_tabella, colWidths=)
+    t = Table(dati_tabella, colWidths=[200, 160, 170])
     t.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#1f77b4")),
         ('ALIGN', (0,0), (-1,-1), 'LEFT'),
