@@ -23,7 +23,7 @@ st.markdown(
 )
 
 st.set_page_config(page_title="Radioprotezione App", page_icon="☢️", layout="centered")
-st.title("☢️ Calcoli di Radioprotezione")
+st.title("☢️ Bonifiche MPJ")
 
 # Elenchi strumentazione e tecnici
 detectors = ["RE-55916", "RE-53065", "RE-53154", "RE-53049", "RE-55049", "RE-54722", "RE-56510", "RE-52083PD", "T98-3822", "T98-3914", "T98-8043", "Default"]
