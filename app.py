@@ -25,7 +25,7 @@ idx_det = detectors.index(sel_det)
 idx_rad = radionuclidi.index(sel_rad)
 
 kTar = taratura[idx_det]
-kGamma = constanteGamma[idx_rad]
+kGamma = costanteGamma[idx_rad]
 tDim = tDimezzamento[idx_rad] * 24 * 3600  # secondi
 
 data_bonifica = st.date_input("Data bonifica:", datetime.now())
