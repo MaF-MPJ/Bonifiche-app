@@ -90,34 +90,32 @@ if st.button("CALCOLA RISULTATI", type="primary"):
 # --- GRAFICO INTERATTIVO AGGIORNATO ---
 st.subheader("📈 Andamento Spaziale del Rateo di Dose")
 
-# 1. Generazione della curva teorica (100 punti continui)
-x_teorico = list(range(1, 101))
+# 1. Generazione della curva teorica (da 2 a 100 cm per una migliore resa visiva dell'asse Y)
+x_teorico = list(range(2, 101))
 y_teorico = [rDose100 * (100 / x)**2 for x in x_teorico]
 df_teorica = pd.DataFrame({"Distanza (cm)": x_teorico, "Rateo di Dose (nSv/h)": y_teorico})
 
 # Creazione del grafico a linee per la teoria (colore Blu)
 linea_teorica = alt.Chart(df_teorica).mark_line(color="#1f77b4", strokeWidth=2.5).encode(
-    x="Distanza (cm):Q",
+    x=alt.X("Distanza (cm):Q", scale=alt.Scale(domain=[0, 100])),
     y="Rateo di Dose (nSv/h):Q"
 )
 
-# 2. Generazione della serie dei soli punti misurati effettivamente inseriti
+# 2. Generazione della serie dei soli punti misurati a distanze fisse (escluso contatto)
 distanze_reali = []
 dosi_reali = []
-if cps0 > 0:
-    distanze_reales.append(1)  # Contatto convenzionale a 1 cm
-    dosi_reali.append(rDose0)
+
 if cps50 > 0:
-    distanze_reales.append(50)
+    distanze_reali.append(50)
     dosi_reali.append(rDose50)
 if cps100 > 0:
-    distanze_reales.append(100)
+    distanze_reali.append(100)
     dosi_reali.append(rDose100)
 
 df_misure = pd.DataFrame({"Distanza (cm)": distanze_reali, "Rateo di Dose (nSv/h)": dosi_reali})
 
 # Creazione dei punti grafici per le misure (Cerchi Arancioni Grandi)
-punti_misurati = alt.Chart(df_misure).mark_circle(size=120, color="#ff7f0e", opacity=1.0).encode(
+punti_misurati = alt.Chart(df_misure).mark_circle(size=140, color="#ff7f0e", opacity=1.0).encode(
     x="Distanza (cm):Q",
     y="Rateo di Dose (nSv/h):Q",
     tooltip=["Distanza (cm)", "Rateo di Dose (nSv/h)"] # Mostra i valori esatti al passaggio del mouse
