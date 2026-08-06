@@ -3,6 +3,7 @@ import math
 from datetime import datetime
 import pandas as pd
 import numpy as np
+import altair as alt
 
 # Inietta il meta tag HTML per l'icona sui dispositivi mobili
 st.markdown(
@@ -89,26 +90,41 @@ if st.button("CALCOLA RISULTATI", type="primary"):
 # --- GRAFICO INTERATTIVO AGGIORNATO ---
 st.subheader("📈 Andamento Spaziale del Rateo di Dose")
 
-# 1. Mappatura dei punti misurati (già convertiti in nSv/h)
-punti_misurati = {}
-if cps0 > 0: punti_misurati[1] = rDose0  # Mappato a 1 cm per evitare divisione per zero
-if cps50 > 0: punti_misurati[50] = rDose50
-if cps100 > 0: punti_misurati[100] = rDose100
-
-# 2. Generazione asse X (Distanze da 1 a 100 cm)
+# 1. Generazione della curva teorica (100 punti continui)
 x_teorico = list(range(1, 101))
-
-# 3. Generazione delle serie di dati
 y_teorico = [rDose100 * (100 / x)**2 for x in x_teorico]
-y_misurato = [punti_misurati.get(x, np.nan) for x in x_teorico]
+df_teorica = pd.DataFrame({"Distanza (cm)": x_teorico, "Rateo di Dose (nSv/h)": y_teorico})
 
-# 4. Creazione del DataFrame per Streamlit
-df_grafico = pd.DataFrame({
-    "Distanza (cm)": x_teorico,
-    "Teorico 1/x² (nSv/h)": y_teorico,
-    "Misurato (nSv/h)": y_misurato
-})
-df_grafico = df_grafico.set_index("Distanza (cm)")
+# Creazione del grafico a linee per la teoria (colore Blu)
+linea_teorica = alt.Chart(df_teorica).mark_line(color="#1f77b4", strokeWidth=2.5).encode(
+    x="Distanza (cm):Q",
+    y="Rateo di Dose (nSv/h):Q"
+)
 
-# 5. Rendering del grafico a linee e punti
-st.line_chart(df_grafico)
+# 2. Generazione della serie dei soli punti misurati effettivamente inseriti
+distanze_reali = []
+dosi_reali = []
+if cps0 > 0:
+    distanze_reales.append(1)  # Contatto convenzionale a 1 cm
+    dosi_reali.append(rDose0)
+if cps50 > 0:
+    distanze_reales.append(50)
+    dosi_reali.append(rDose50)
+if cps100 > 0:
+    distanze_reales.append(100)
+    dosi_reali.append(rDose100)
+
+df_misure = pd.DataFrame({"Distanza (cm)": distanze_reali, "Rateo di Dose (nSv/h)": dosi_reali})
+
+# Creazione dei punti grafici per le misure (Cerchi Arancioni Grandi)
+punti_misurati = alt.Chart(df_misure).mark_circle(size=120, color="#ff7f0e", opacity=1.0).encode(
+    x="Distanza (cm):Q",
+    y="Rateo di Dose (nSv/h):Q",
+    tooltip=["Distanza (cm)", "Rateo di Dose (nSv/h)"] # Mostra i valori esatti al passaggio del mouse
+)
+
+# 3. Sovrapposizione dei due grafici nello stesso riquadro
+grafico_finale = alt.layer(linea_teorica, punti_misurati).interactive()
+
+# 4. Rendering su Streamlit
+st.altair_chart(grafico_finale, use_container_width=True)
