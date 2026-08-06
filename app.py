@@ -7,8 +7,8 @@ import pandas as pd
 st.markdown(
     """
     <head>
-        <link rel="apple-touch-icon" href="https://github.com/MaF-MPJ/Bonifiche-app/blob/1a5aea9fa2fb761f86bfe965bc9a9b574a55ac39/MPJ_Logo.png">
-        <link rel="icon" sizes="192x192" href="https://github.com/MaF-MPJ/Bonifiche-app/blob/1a5aea9fa2fb761f86bfe965bc9a9b574a55ac39/MPJ_Logo.png">
+        <link rel="apple-touch-icon" href="https://github.com/MaF-MPJ/Bonifiche-app/blob/bd70a2a5bedfb9b988570cb839db507a610f187a/MPJ_Logo192.png">
+        <link rel="icon" sizes="192x192" href="https://github.com/MaF-MPJ/Bonifiche-app/blob/bd70a2a5bedfb9b988570cb839db507a610f187a/MPJ_Logo192.png">
     </head>
     """,
     unsafe_allow_html=True
