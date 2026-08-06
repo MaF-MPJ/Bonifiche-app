@@ -144,7 +144,7 @@ st.altair_chart(grafico_finale, use_container_width=True)
 
 # --- TABELLA DI SCOSTAMENTO PERCENTUALE ---
 if cps50 > 0 and cps100 > 0:
-    st.subheader("📊 Analisi di Coerenza della Misura")
+    st.subheader("📊 Analisi di Coherence della Misura")
     dose_teorica_50 = rDose100 * (100 / 50)**2
     scostamento_perc = ((rDose50 - dose_teorica_50) / dose_teorica_50) * 100
     
@@ -269,7 +269,7 @@ with col_pdf:
     )
 
 with col_wa:
-        testo_messaggio = (
+    testo_messaggio = (
         f"--- *REPORT RADIOPROTEZIONE* ---\n"
         f"📅 Data: {datetime.now().strftime('%d/%m/%Y')}\n"
         f"🔬 Radionuclide: {sel_rad}\n"
@@ -278,7 +278,7 @@ with col_wa:
         f"📥 Scarica il PDF completo dall'applicazione."
     )
     testo_codificato = urllib.parse.quote(testo_messaggio)
-    link_whatsapp = f"wa.me{testo_codificato}"
+    link_whatsapp = f"https://wa.me{testo_codificato}"
     
     st.link_button(
         label="💬 Condividi su WhatsApp",
@@ -286,3 +286,4 @@ with col_wa:
         type="primary",
         use_container_width=True
     )
+
