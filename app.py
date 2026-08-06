@@ -266,10 +266,10 @@ with col_wa:
     testo_messaggio = (
         f"--- *REPORT RADIOPROTEZIONE* ---\n"
         f"📅 Data: {datetime.now().strftime('%d/%m/%Y')}\n"
-        f"🔬 Radionuclide: {sel_rad}\n
-        "f"📈 Dose 1m: {rDose100:.2f} nSv/h\n
-        "f"📈 Dose 50cm: {rDose50:.2f} nSv/h\n
-        "f"📥 Scarica il PDF completo dall'applicazione."
+        f"🔬 Radionuclide: {sel_rad}\n"
+        f"📈 Dose 1m: {rDose100:.2f} nSv/h\n"
+        f"📈 Dose 50cm: {rDose50:.2f} nSv/h\n"
+        f"📥 Scarica il PDF completo dall'applicazione."
     )
     testo_codificato = urllib.parse.quote(testo_messaggio)
     link_whatsapp = f"wa.me{testo_codificato}"
