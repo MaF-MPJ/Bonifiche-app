@@ -194,36 +194,36 @@ def genera_pdf_bytes(file_immagine_png="logo_MULTIPROJECT_NEW+CARSO-3cm.png"):
     doc = SimpleDocTemplate(
         buffer, 
         pagesize=letter,
-        rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40,
+        rightMargin=40, leftMargin=40, topMargin=25, bottomMargin=25,
         title="Report Radioprotezione"
     )
     
     styles = getSampleStyleSheet()
-    stile_titolo = ParagraphStyle('TitoloPDF', parent=styles['Heading1'], fontSize=20, leading=24, textColor=colors.HexColor("#1f77b4"), alignment=1)
-    stile_sottotitolo = ParagraphStyle('SubPDF', parent=styles['Normal'], fontSize=10, leading=14, textColor=colors.gray, alignment=1)
-    stile_sezione = ParagraphStyle('SezPDF', parent=styles['Heading2'], fontSize=14, leading=18, textColor=colors.HexColor("#2c3e50"), spaceBefore=15, spaceAfter=8)
-    stile_testo = ParagraphStyle('TestoPDF', parent=styles['Normal'], fontSize=11, leading=16, textColor=colors.HexColor("#333333"))
-    stile_tabella_header = ParagraphStyle('TabHead', parent=styles['Normal'], fontSize=10, leading=12, textColor=colors.white, fontName="Helvetica-Bold")
-    stile_tabella_testo = ParagraphStyle('TabTxt', parent=styles['Normal'], fontSize=10, leading=12, textColor=colors.HexColor("#333333"))
+    stile_titolo = ParagraphStyle('TitoloPDF', parent=styles['Heading1'], fontSize=18, leading=22, textColor=colors.HexColor("#1f77b4"), alignment=1)
+    stile_sottotitolo = ParagraphStyle('SubPDF', parent=styles['Normal'], fontSize=9, leading=13, textColor=colors.gray, alignment=1)
+    stile_sezione = ParagraphStyle('SezPDF', parent=styles['Heading2'], fontSize=12, leading=16, textColor=colors.HexColor("#2c3e50"), spaceBefore=15, spaceAfter=8)
+    stile_testo = ParagraphStyle('TestoPDF', parent=styles['Normal'], fontSize=10, leading=14, textColor=colors.HexColor("#333333"))
+    stile_tabella_header = ParagraphStyle('TabHead', parent=styles['Normal'], fontSize=9, leading=11, textColor=colors.white, fontName="Helvetica-Bold")
+    stile_tabella_testo = ParagraphStyle('TabTxt', parent=styles['Normal'], fontSize=9, leading=11, textColor=colors.HexColor("#333333"))
 
     elementi = []
     
     # --- Gestione Intestazione con Logo Verticale ---
-    titolo_testo = f"<b>REPORT DI RADIOPROTEZIONE</b><br/><font size=14 color='#2c3e50'>Anomalia N° {num_anomalia}</font>" if num_anomalia else "<b>REPORT DI RADIOPROTEZIONE</b>"
+    titolo_testo = f"<b>REPORT DI RADIOPROTEZIONE</b><br/><font size=12 color='#2c3e50'>Anomalia N° {num_anomalia}</font>" if num_anomalia else "<b>REPORT DI RADIOPROTEZIONE</b>"
     p_titolo = Paragraph(titolo_testo, stile_titolo)
     p_data = Paragraph(f"Generato il: {datetime.now().strftime('%d/%m/%Y alle %H:%M')}", stile_sottotitolo)
     
     # Blocco unico per i testi del titolo
-    blocco_titolo = [p_titolo, Spacer(1, 5), p_data]
+    blocco_titolo = [p_titolo, Spacer(1, 3), p_data]
 
     if file_immagine_png is not None:
         try:
             # Dimensioni ottimizzate per mantenere le proporzioni verticali del logo
-            logo = Image(file_immagine_png, width=70, height=105)
+            logo = Image(file_immagine_png, width=60, height=90)
             
             # Creiamo una tabella a due colonne: a sinistra il logo, a destra il titolo
             # Larghezza totale disponibile ~530 (70 logo + 20 spazio + 440 titolo)
-            tabella_header = Table([[logo, blocco_titolo]], colWidths=[70, 460])
+            tabella_header = Table([[logo, blocco_titolo]], colWidths=[60, 470])
             tabella_header.setStyle(TableStyle([
                 ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
                 ('ALIGN', (1,0), (1,0), 'CENTER'), # Centra il testo del titolo nella sua colonna
@@ -241,7 +241,7 @@ def genera_pdf_bytes(file_immagine_png="logo_MULTIPROJECT_NEW+CARSO-3cm.png"):
         elementi.append(p_titolo)
         elementi.append(p_data)
         
-    elementi.append(Spacer(1, 20))
+    elementi.append(Spacer(1, 10))
     
     # Da qui in poi il codice della "Sezione 1" rimane identico...
     
@@ -259,7 +259,7 @@ def genera_pdf_bytes(file_immagine_png="logo_MULTIPROJECT_NEW+CARSO-3cm.png"):
         f"<b>Data di riferimento bonifica:</b> {data_bonifica.strftime('%d/%m/%Y')}"
     )
     elementi.append(Paragraph(info_parametri, stile_testo))
-    elementi.append(Spacer(1, 10))
+    elementi.append(Spacer(1, 5))
     
     # Sezione 2: Risultati e Misure (Fondi e Reperto uniti cronologicamente)
     elementi.append(Paragraph("<b>2. Risultati Rateo di Dose</b>", stile_sezione))
@@ -290,7 +290,7 @@ def genera_pdf_bytes(file_immagine_png="logo_MULTIPROJECT_NEW+CARSO-3cm.png"):
         ('TOPPADDING', (0,0), (-1,-1), 6),
     ]))
     elementi.append(t)
-    elementi.append(Spacer(1, 15))
+    elementi.append(Spacer(1, 10))
     
     # Sezione 3: Analisi e Stime di Smaltimento
     elementi.append(Paragraph("<b>3. Analisi e Stime di Smaltimento</b>", stile_sezione))
@@ -311,11 +311,11 @@ def genera_pdf_bytes(file_immagine_png="logo_MULTIPROJECT_NEW+CARSO-3cm.png"):
         testo_smaltimento += f"<br/>• <b>Coerenza della misura:</b> Lo scostamento geometrico calcolato a 50 cm rispetto alla legge dell'inverso del quadrato è pari a <b>{scostamento_perc:+.1f}%</b>.<br/>"
         
     elementi.append(Paragraph(testo_smaltimento, stile_testo))
-    elementi.append(Spacer(1, 40))
+    elementi.append(Spacer(1, 20))
     
     elementi.append(Paragraph("___________________________<br/><i>Firma: L'Esperto di Radioprotezione</i>", stile_testo))
     
-    elementi.append(Spacer(1, 30))
+    elementi.append(Spacer(1, 15))
     elementi.append(Paragraph("<font size=8 color=gray>.</font>", stile_sottotitolo))
     
     doc.build(elementi)
