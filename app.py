@@ -189,7 +189,7 @@ if cps50 > 0 and cps100 > 0:
         st.error("🚨 **Scostamento elevato**: Differenza superiore al 25%. Possibile presenza di schermature parziali, sorgente estesa o errore strumentale.")
 st.subheader("📄 Esportazione Report")
 
-def genera_pdf_bytes(file_immagine_png=None):
+def genera_pdf_bytes(file_immagine_png="logo_MULTIPROJECT_NEW+CARSO-3cm.png"):
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer, 
