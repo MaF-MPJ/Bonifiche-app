@@ -254,7 +254,7 @@ def genera_pdf_bytes(file_immagine_png="logo_MULTIPROJECT_NEW+CARSO-3cm.png"):
         f"<b>Operatore Tecnico:</b> {sel_tecnico}<br/>"
         f"<b>Targa Veicolo Bonificato:</b> {targa_output}<br/>"
         f"<b>Descrizione Reperto:</b> {desc_output}<br/><br/>"
-        f"<b>Detector Selezionato:</b> {sel_det} (Fattore Taratura kTar: {kTar})<br/>"
+        f"<b>Detector Selezionato:</b> {sel_det} (Fattore Taratura: {kTar} nSv/cps)<br/>"
         f"<b>Radionuclide Selezionato:</b> {sel_rad} (Costante Gamma: {kGamma}, Dimezzamento: {tDimezzamento[idx_rad]} giorni)<br/>"
         f"<b>Data di riferimento bonifica:</b> {data_bonifica.strftime('%d/%m/%Y')}"
     )
@@ -311,7 +311,7 @@ def genera_pdf_bytes(file_immagine_png="logo_MULTIPROJECT_NEW+CARSO-3cm.png"):
         testo_smaltimento += f"<br/>• <b>Coerenza della misura:</b> Lo scostamento geometrico calcolato a 50 cm rispetto alla legge dell'inverso del quadrato è pari a <b>{scostamento_perc:+.1f}%</b>.<br/>"
         
     elementi.append(Paragraph(testo_smaltimento, stile_testo))
-    elementi.append(Spacer(1, 20))
+    elementi.append(Spacer(1, 40))
     
     elementi.append(Paragraph("___________________________<br/><i>Firma: Esperto di Radioprotezione</i>", stile_testo))
     
