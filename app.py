@@ -313,7 +313,7 @@ def genera_pdf_bytes(file_immagine_png="logo_MULTIPROJECT_NEW+CARSO-3cm.png"):
     elementi.append(Paragraph(testo_smaltimento, stile_testo))
     elementi.append(Spacer(1, 40))
     
-    elementi.append(Paragraph("___________________________<br/><i>Firma: Esperto di Radioprotezione</i>", stile_testo))
+    elementi.append(Paragraph("___________________________<br/><i>Esperto di Radioprotezione</i>", stile_testo))
     
     elementi.append(Spacer(1, 15))
     elementi.append(Paragraph("<font size=8 color=gray>.</font>", stile_sottotitolo))
