@@ -313,7 +313,7 @@ def genera_pdf_bytes(file_immagine_png="logo_MULTIPROJECT_NEW+CARSO-3cm.png"):
     elementi.append(Paragraph(testo_smaltimento, stile_testo))
     elementi.append(Spacer(1, 20))
     
-    elementi.append(Paragraph("___________________________<br/><i>Firma: L'Esperto di Radioprotezione</i>", stile_testo))
+    elementi.append(Paragraph("___________________________<br/><i>Firma: Esperto di Radioprotezione</i>", stile_testo))
     
     elementi.append(Spacer(1, 15))
     elementi.append(Paragraph("<font size=8 color=gray>.</font>", stile_sottotitolo))
@@ -327,7 +327,7 @@ pdf_data = genera_pdf_bytes()
 st.download_button(
     label="📥 Scarica Report PDF Stampabile",
     data=pdf_data,
-    file_name=f"Report_Radioprotezione_{datetime.now().strftime('%Y%m%d')}.pdf",
+    file_name=f"Report_Radioprotezione_{datetime.now().strftime('%Y%m%d-%H%M')}.pdf",
     mime="application/pdf",
     type="primary",
     use_container_width=True
