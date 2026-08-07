@@ -36,8 +36,9 @@ radionuclidi = ["I-131", "I-123", "Tc-99m", "Lu-177", "Lu-177m", "Ra-226", "NORM
 costanteGamma = [77.0, 74.8, 33.2, 7.64, 211.0, 258.0, 316.0, 864.0, 22.2, 104.0, 373.0, 0.426, 136.0, 161.0]
 tDimezzamento = [8.02, 0.551, 0.25, 6.65, 160.0, 584000.0, 1.63e12, 5.12e12, 4.56e11, 11000.0, 19200.0, 3920.0, 2.81, 73.8]
 
-# NUOVA SEZIONE: IDENTIFICAZIONE INTERVENTO
+# IDENTIFICAZIONE INTERVENTO
 st.subheader("📋 Dati Identificativi Intervento")
+num_anomalia = st.text_input("Numero Anomalia", placeholder="Es. A:18/26")
 sel_tecnico = st.selectbox("Tecnico Operatore:", tecnici)
 targa_veicolo = st.text_input("Targa Veicolo:", placeholder="Es. AA123BB").upper()
 desc_reperto = st.text_area("Descrizione Reperto Rilevato:", placeholder="Descrivere brevemente la tipologia e la collocazione del materiale...")
@@ -57,10 +58,23 @@ tDim = emivita_giorni * 24 * 3600
 data_bonifica = st.date_input("Data bonifica:", datetime.now())
 
 st.subheader("Inserimento Misure (cps)")
+col1, col2 = st.columns(2)
+with col1:
+    cps_fondo_locale = st.number_input("Fondo naturale locale (cps)", min_value=0.0, step=1.0)
+    cps_fondo_parete = st.number_input("Fondo di riferimento - [valore medio a parete] (cps)", min_value=0.0, step=1.0)
+with col2:
+    cps_max_parete = st.number_input("Valore max a parete (cps)", min_value=0.0, step=1.0)
+    cps_cabina = st.number_input("Cabina conducente (cps)", min_value=0.0, step=1.0)
+
+st.subheader("Inserimento Misure Reperto (cps)")
 cps0 = st.number_input("cps a contatto:", min_value=0.0, value=0.0)
 cps50 = st.number_input("cps a 50 cm:", min_value=0.0, value=0.0)
 cps100 = st.number_input("cps a 1m:", min_value=0.0, value=0.0)
 
+dose_fondo_locale = cps_fondo_locale * kTar
+dose_fondo_parete = cps_fondo_parete * kTar
+dose_max_parete = cps_max_parete * kTar
+dose_cabina = cps_cabina * kTar
 rDose0 = cps0 * kTar
 rDose50 = cps50 * kTar
 rDose100 = cps100 * kTar
@@ -84,7 +98,12 @@ else:
         date100 = datetime.fromtimestamp(dStart_ts + outData100).strftime("%d/%m/%Y")
 
 if st.button("CALCOLA RISULTATI", type="primary"):
+    st.subheader(f"📋 Report Anomalia N°: {num_anomalia}")
     st.success("### 📊 Risultati Rateo di Dose")
+    st.write(f"**Fondo locale:** {dose_fondo_locale:.2f} nSv/h}")
+    st.write(f"**Fondo di riferimento:** {dose_fondo_parete:.2f} nSv/h}")
+    st.write(f"**Valore max a parete:** {dose_max_parete:.2f} nSv/h}")
+    st.write(f"**Rateo di dose cabina conducente:** {dose_cabina:.2f} nSv/h}")
     st.write(f"**Rateo di dose a contatto:** {rDose0:.2f} nSv/h")
     st.write(f"**Rateo di dose a 50 cm:** {rDose50:.2f} nSv/h")
     st.write(f"**Rateo di dose a 1 metro:** {rDose100:.2f} nSv/h")
