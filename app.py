@@ -189,7 +189,7 @@ if cps50 > 0 and cps100 > 0:
         st.error("🚨 **Scostamento elevato**: Differenza superiore al 25%. Possibile presenza di schermature parziali, sorgente estesa o errore strumentale.")
 st.subheader("📄 Esportazione Report")
 
-def genera_pdf_bytes():
+def genera_pdf_bytes(file_immagine_png=None):
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer, 
@@ -199,7 +199,7 @@ def genera_pdf_bytes():
     )
     
     styles = getSampleStyleSheet()
-    stile_titolo = ParagraphStyle('TitoloPDF', parent=styles['Heading1'], fontSize=22, leading=26, textColor=colors.HexColor("#1f77b4"), alignment=1)
+    stile_titolo = ParagraphStyle('TitoloPDF', parent=styles['Heading1'], fontSize=20, leading=24, textColor=colors.HexColor("#1f77b4"), alignment=1)
     stile_sottotitolo = ParagraphStyle('SubPDF', parent=styles['Normal'], fontSize=10, leading=14, textColor=colors.gray, alignment=1)
     stile_sezione = ParagraphStyle('SezPDF', parent=styles['Heading2'], fontSize=14, leading=18, textColor=colors.HexColor("#2c3e50"), spaceBefore=15, spaceAfter=8)
     stile_testo = ParagraphStyle('TestoPDF', parent=styles['Normal'], fontSize=11, leading=16, textColor=colors.HexColor("#333333"))
@@ -207,11 +207,25 @@ def genera_pdf_bytes():
     stile_tabella_testo = ParagraphStyle('TabTxt', parent=styles['Normal'], fontSize=10, leading=12, textColor=colors.HexColor("#333333"))
 
     elementi = []
-    elementi.append(Paragraph("<b>REPORT DI RADIOPROTEZIONE</b>", stile_titolo))
+    
+    # --- Gestione Intestazione PNG ---
+    if file_immagine_png is not None:
+        try:
+            # Sfrutta la larghezza disponibile del foglio (~530 punti)
+            logo = Image(file_immagine_png, width=530, height=75)
+            elementi.append(logo)
+            elementi.append(Spacer(1, 15))
+        except Exception as e:
+            elementi.append(Paragraph(f"<i>[Errore caricamento logo intestazione: {str(e)}]</i>", stile_sottotitolo))
+            elementi.append(Spacer(1, 10))
+            
+    # Titolo principale aggiornato con il numero di anomalia
+    titolo_testo = f"<b>REPORT DI RADIOPROTEZIONE - ANOMALIA N° {num_anomalia}</b>" if num_anomalia else "<b>REPORT DI RADIOPROTEZIONE</b>"
+    elementi.append(Paragraph(titolo_testo, stile_titolo))
     elementi.append(Paragraph(f"Generato il: {datetime.now().strftime('%d/%m/%Y alle %H:%M')}", stile_sottotitolo))
     elementi.append(Spacer(1, 15))
     
-    # Sezione 1 aggiornata con i dati descrittivi dell'intervento
+    # Sezione 1: Dati descrittivi dell'intervento
     elementi.append(Paragraph("<b>1. Dati Intervento e Configurazione Parametri</b>", stile_sezione))
     targa_output = targa_veicolo if targa_veicolo else "N/D"
     desc_output = desc_reperto if desc_reperto else "Nessuna descrizione inserita."
@@ -227,16 +241,23 @@ def genera_pdf_bytes():
     elementi.append(Paragraph(info_parametri, stile_testo))
     elementi.append(Spacer(1, 10))
     
+    # Sezione 2: Risultati e Misure (Fondi e Reperto uniti cronologicamente)
     elementi.append(Paragraph("<b>2. Risultati Rateo di Dose</b>", stile_sezione))
     intestazioni = [Paragraph("<b>Posizione Misura</b>", stile_tabella_header), 
                     Paragraph("<b>Valore Inserito (cps)</b>", stile_tabella_header), 
                     Paragraph("<b>Rateo di Dose (nSv/h)</b>", stile_tabella_header)]
     
-    riga0 = [Paragraph("A contatto (1 cm)", stile_tabella_testo), Paragraph(f"{cps0:.1f}", stile_tabella_testo), Paragraph(f"{rDose0:.2f}", stile_tabella_testo)]
-    riga50 = [Paragraph("A 50 cm", stile_tabella_testo), Paragraph(f"{cps50:.1f}", stile_tabella_testo), Paragraph(f"{rDose50:.2f}", stile_tabella_testo)]
-    riga100 = [Paragraph("A 1 metro", stile_tabella_testo), Paragraph(f"{cps100:.1f}", stile_tabella_testo), Paragraph(f"{rDose100:.2f}", stile_tabella_testo)]
-    
-    dati_tabella = [intestazioni, riga0, riga50, riga100]
+    # Array dati tabella aggiornato con le nuove 4 misure iniziali richieste
+    dati_tabella = [
+        intestazioni,
+        [Paragraph("Fondo naturale locale", stile_tabella_testo), Paragraph(f"{cps_fondo_locale:.1f}", stile_tabella_testo), Paragraph(f"{dose_fondo_locale:.2f}", stile_tabella_testo)],
+        [Paragraph("Fondo di riferimento (medio a parete)", stile_tabella_testo), Paragraph(f"{cps_fondo_parete:.1f}", stile_tabella_testo), Paragraph(f"{dose_fondo_parete:.2f}", stile_tabella_testo)],
+        [Paragraph("Valore max a parete", stile_tabella_testo), Paragraph(f"{cps_max_parete:.1f}", stile_tabella_testo), Paragraph(f"{dose_max_parete:.2f}", stile_tabella_testo)],
+        [Paragraph("Cabina conducente", stile_tabella_testo), Paragraph(f"{cps_cabina:.1f}", stile_tabella_testo), Paragraph(f"{dose_cabina:.2f}", stile_tabella_testo)],
+        [Paragraph("A contatto (1 cm)", stile_tabella_testo), Paragraph(f"{cps0:.1f}", stile_tabella_testo), Paragraph(f"{rDose0:.2f}", stile_tabella_testo)],
+        [Paragraph("A 50 cm", stile_tabella_testo), Paragraph(f"{cps50:.1f}", stile_tabella_testo), Paragraph(f"{rDose50:.2f}", stile_tabella_testo)],
+        [Paragraph("A 1 metro", stile_tabella_testo), Paragraph(f"{cps100:.1f}", stile_tabella_testo), Paragraph(f"{rDose100:.2f}", stile_tabella_testo)]
+    ]
     
     t = Table(dati_tabella, colWidths=[200, 160, 170])
     t.setStyle(TableStyle([
@@ -251,6 +272,7 @@ def genera_pdf_bytes():
     elementi.append(t)
     elementi.append(Spacer(1, 15))
     
+    # Sezione 3: Analisi e Stime di Smaltimento
     elementi.append(Paragraph("<b>3. Analisi e Stime di Smaltimento</b>", stile_sezione))
     testo_smaltimento = ""
     if valAtt50 > 0:
@@ -279,6 +301,7 @@ def genera_pdf_bytes():
     doc.build(elementi)
     buffer.seek(0)
     return buffer.getvalue()
+
 
 pdf_data = genera_pdf_bytes()
 st.download_button(
