@@ -206,18 +206,45 @@ def genera_pdf_bytes(file_immagine_png=None):
     stile_tabella_header = ParagraphStyle('TabHead', parent=styles['Normal'], fontSize=10, leading=12, textColor=colors.white, fontName="Helvetica-Bold")
     stile_tabella_testo = ParagraphStyle('TabTxt', parent=styles['Normal'], fontSize=10, leading=12, textColor=colors.HexColor("#333333"))
 
-    elementi = []
+        elementi = []
     
-    # --- Gestione Intestazione PNG ---
+    # --- Gestione Intestazione con Logo Verticale ---
+    titolo_testo = f"<b>REPORT DI RADIOPROTEZIONE</b><br/><font size=14 color='#2c3e50'>Anomalia N° {num_anomalia}</font>" if num_anomalia else "<b>REPORT DI RADIOPROTEZIONE</b>"
+    p_titolo = Paragraph(titolo_testo, stile_titolo)
+    p_data = Paragraph(f"Generato il: {datetime.now().strftime('%d/%m/%Y alle %H:%M')}", stile_sottotitolo)
+    
+    # Blocco unico per i testi del titolo
+    blocco_titolo = [p_titolo, Spacer(1, 5), p_data]
+
     if file_immagine_png is not None:
         try:
-            # Sfrutta la larghezza disponibile del foglio (~530 punti)
-            logo = Image(file_immagine_png, width=530, height=75)
-            elementi.append(logo)
-            elementi.append(Spacer(1, 15))
+            # Dimensioni ottimizzate per mantenere le proporzioni verticali del logo
+            logo = Image(file_immagine_png, width=70, height=105)
+            
+            # Creiamo una tabella a due colonne: a sinistra il logo, a destra il titolo
+            # Larghezza totale disponibile ~530 (70 logo + 20 spazio + 440 titolo)
+            tabella_header = Table([[logo, blocco_titolo]], colWidths=[70, 460])
+            tabella_header.setStyle(TableStyle([
+                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                ('ALIGN', (1,0), (1,0), 'CENTER'), # Centra il testo del titolo nella sua colonna
+                ('LEFTPADDING', (1,0), (1,0), 15),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 0),
+                ('TOPPADDING', (0,0), (-1,-1), 0),
+            ]))
+            elementi.append(tabella_header)
         except Exception as e:
-            elementi.append(Paragraph(f"<i>[Errore caricamento logo intestazione: {str(e)}]</i>", stile_sottotitolo))
-            elementi.append(Spacer(1, 10))
+            elementi.append(Paragraph(f"<i>[Errore caricamento logo: {str(e)}]</i>", stile_sottotitolo))
+            elementi.append(p_titolo)
+            elementi.append(p_data)
+    else:
+        # Fallback se non viene caricata nessuna immagine
+        elementi.append(p_titolo)
+        elementi.append(p_data)
+        
+    elementi.append(Spacer(1, 20))
+    
+    # Da qui in poi il codice della "Sezione 1" rimane identico...
+
             
     # Titolo principale aggiornato con il numero di anomalia
     titolo_testo = f"<b>REPORT DI RADIOPROTEZIONE - ANOMALIA N° {num_anomalia}</b>" if num_anomalia else "<b>REPORT DI RADIOPROTEZIONE</b>"
