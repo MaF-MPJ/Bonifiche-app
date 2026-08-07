@@ -244,13 +244,6 @@ def genera_pdf_bytes(file_immagine_png=None):
     elementi.append(Spacer(1, 20))
     
     # Da qui in poi il codice della "Sezione 1" rimane identico...
-
-            
-    # Titolo principale aggiornato con il numero di anomalia
-    titolo_testo = f"<b>REPORT DI RADIOPROTEZIONE - ANOMALIA N° {num_anomalia}</b>" if num_anomalia else "<b>REPORT DI RADIOPROTEZIONE</b>"
-    elementi.append(Paragraph(titolo_testo, stile_titolo))
-    elementi.append(Paragraph(f"Generato il: {datetime.now().strftime('%d/%m/%Y alle %H:%M')}", stile_sottotitolo))
-    elementi.append(Spacer(1, 15))
     
     # Sezione 1: Dati descrittivi dell'intervento
     elementi.append(Paragraph("<b>1. Dati Intervento e Configurazione Parametri</b>", stile_sezione))
