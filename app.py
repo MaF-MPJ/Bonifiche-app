@@ -296,7 +296,7 @@ def genera_pdf_bytes(file_immagine_png=None):
     elementi.append(Paragraph("___________________________<br/><i>Firma: L'Esperto di Radioprotezione</i>", stile_testo))
     
     elementi.append(Spacer(1, 30))
-    elementi.append(Paragraph("<font size=8 color=gray>This is for informational purposes only. For medical advice or diagnosis, consult a professional. AI responses may include mistakes.</font>", stile_sottotitolo))
+    elementi.append(Paragraph("<font size=8 color=gray>.</font>", stile_sottotitolo))
     
     doc.build(elementi)
     buffer.seek(0)
