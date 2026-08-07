@@ -30,7 +30,7 @@ detectors = ["RE-55916", "RE-53065", "RE-53154", "RE-53049", "RE-55049", "RE-547
 taratura = [0.577, 0.631, 0.613, 0.609, 0.588, 0.598, 0.667, 0.514, 0.612, 0.523, 0.523, 0.602]
 
 # Lista dei tecnici (puoi modificare i nomi all'interno di questo array)
-tecnici = ["Andrea Colli", "Andrea Giliberto", "Davide Concion", "Stefano Bignolini", "Altro / Operatore"]
+tecnici = ["Andrea Colli", "Andrea Giliberto", "Davide Concion", "Paolo Riondato", "Stefano Bignolini", "Altro / Operatore"]
 
 radionuclidi = ["I-131", "I-123", "Tc-99m", "Lu-177", "Lu-177m", "Ra-226", "NORM", "Th-232+", "K-40", "Cs-137", "Co-60", "Kr-85", "In-111", "Ir-192"]
 costanteGamma = [77.0, 74.8, 33.2, 7.64, 211.0, 258.0, 316.0, 864.0, 22.2, 104.0, 373.0, 0.426, 136.0, 161.0]
