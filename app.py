@@ -206,7 +206,7 @@ def genera_pdf_bytes(file_immagine_png=None):
     stile_tabella_header = ParagraphStyle('TabHead', parent=styles['Normal'], fontSize=10, leading=12, textColor=colors.white, fontName="Helvetica-Bold")
     stile_tabella_testo = ParagraphStyle('TabTxt', parent=styles['Normal'], fontSize=10, leading=12, textColor=colors.HexColor("#333333"))
 
-        elementi = []
+    elementi = []
     
     # --- Gestione Intestazione con Logo Verticale ---
     titolo_testo = f"<b>REPORT DI RADIOPROTEZIONE</b><br/><font size=14 color='#2c3e50'>Anomalia N° {num_anomalia}</font>" if num_anomalia else "<b>REPORT DI RADIOPROTEZIONE</b>"
