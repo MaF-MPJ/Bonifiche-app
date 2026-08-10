@@ -70,6 +70,7 @@ st.subheader("Inserimento Misure Reperto (cps)")
 cps0 = st.number_input("cps a contatto:", min_value=0.0, value=0.0)
 cps50 = st.number_input("cps a 50 cm:", min_value=0.0, value=0.0)
 cps100 = st.number_input("cps a 1m:", min_value=0.0, value=0.0)
+massa = st.number_input("Massa del reperto (kg)", min_value=0.0, step=1.0)
 
 dose_fondo_locale = cps_fondo_locale * kTar
 dose_fondo_parete = cps_fondo_parete * kTar
@@ -107,6 +108,7 @@ if st.button("CALCOLA RISULTATI", type="primary"):
     st.write(f"**Rateo di dose a contatto:** {rDose0:.2f} nSv/h")
     st.write(f"**Rateo di dose a 50 cm:** {rDose50:.2f} nSv/h")
     st.write(f"**Rateo di dose a 1 metro:** {rDose100:.2f} nSv/h")
+    st.write(f"**Massa del reperto:** {massa:.2f} kg")
     
     st.info("### 📉 Stime di Smaltimento")
     if valAtt50 > 0:
@@ -253,7 +255,8 @@ def genera_pdf_bytes(file_immagine_png="logo_MULTIPROJECT_NEW+CARSO-3cm.png"):
     info_parametri = (
         f"<b>Operatore Tecnico:</b> {sel_tecnico}<br/>"
         f"<b>Targa Veicolo Bonificato:</b> {targa_output}<br/>"
-        f"<b>Descrizione Reperto:</b> {desc_output}<br/><br/>"
+        f"<b>Descrizione Reperto:</b> {desc_output}<br/>"
+        f"<b>Massa Reperto:</b> {massa} kg<br/><br/>"
         f"<b>Detector Selezionato:</b> {sel_det} (Fattore Taratura: {kTar} nSv/cps)<br/>"
         f"<b>Radionuclide Selezionato:</b> {sel_rad} (Costante Gamma: {kGamma}, Dimezzamento: {tDimezzamento[idx_rad]} giorni)<br/>"
         f"<b>Data di riferimento bonifica:</b> {data_bonifica.strftime('%d/%m/%Y')}"
