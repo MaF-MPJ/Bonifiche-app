@@ -268,18 +268,18 @@ def genera_pdf_bytes(file_immagine_png="logo_MULTIPROJECT_NEW+CARSO-3cm.png"):
     elementi.append(Paragraph("<b>2. Risultati Rateo di Dose</b>", stile_sezione))
     intestazioni = [Paragraph("<b>Posizione Misura</b>", stile_tabella_header), 
                     Paragraph("<b>Valore Inserito (cps)</b>", stile_tabella_header), 
-                    Paragraph("<b>Rateo di Dose (nSv/h)</b>", stile_tabella_header)]
+                    Paragraph("<b>Rateo di Dose (μSv/h)</b>", stile_tabella_header)]
     
     # Array dati tabella aggiornato con le nuove 4 misure iniziali richieste
     dati_tabella = [
         intestazioni,
-        [Paragraph("Fondo naturale locale", stile_tabella_testo), Paragraph(f"{cps_fondo_locale:.1f}", stile_tabella_testo), Paragraph(f"{dose_fondo_locale:.2f}", stile_tabella_testo)],
-        [Paragraph("Fondo di riferimento (medio a parete)", stile_tabella_testo), Paragraph(f"{cps_fondo_parete:.1f}", stile_tabella_testo), Paragraph(f"{dose_fondo_parete:.2f}", stile_tabella_testo)],
-        [Paragraph("Valore max a parete", stile_tabella_testo), Paragraph(f"{cps_max_parete:.1f}", stile_tabella_testo), Paragraph(f"{dose_max_parete:.2f}", stile_tabella_testo)],
-        [Paragraph("Cabina conducente", stile_tabella_testo), Paragraph(f"{cps_cabina:.1f}", stile_tabella_testo), Paragraph(f"{dose_cabina:.2f}", stile_tabella_testo)],
-        [Paragraph("A contatto (1 cm)", stile_tabella_testo), Paragraph(f"{cps0:.1f}", stile_tabella_testo), Paragraph(f"{rDose0:.2f}", stile_tabella_testo)],
-        [Paragraph("A 50 cm", stile_tabella_testo), Paragraph(f"{cps50:.1f}", stile_tabella_testo), Paragraph(f"{rDose50:.2f}", stile_tabella_testo)],
-        [Paragraph("A 1 metro", stile_tabella_testo), Paragraph(f"{cps100:.1f}", stile_tabella_testo), Paragraph(f"{rDose100:.2f}", stile_tabella_testo)]
+        [Paragraph("Fondo naturale locale", stile_tabella_testo), Paragraph(f"{cps_fondo_locale:.1f}", stile_tabella_testo), Paragraph(f"{dose_fondo_locale/1e3:.3f}", stile_tabella_testo)],
+        [Paragraph("Fondo di riferimento (medio a parete)", stile_tabella_testo), Paragraph(f"{cps_fondo_parete:.1f}", stile_tabella_testo), Paragraph(f"{dose_fondo_parete/1e3:.3f}", stile_tabella_testo)],
+        [Paragraph("Valore max a parete", stile_tabella_testo), Paragraph(f"{cps_max_parete:.1f}", stile_tabella_testo), Paragraph(f"{dose_max_parete/1e3:.3f}", stile_tabella_testo)],
+        [Paragraph("Cabina conducente", stile_tabella_testo), Paragraph(f"{cps_cabina:.1f}", stile_tabella_testo), Paragraph(f"{dose_cabina/1e3:.3f}", stile_tabella_testo)],
+        [Paragraph("A contatto (1 cm)", stile_tabella_testo), Paragraph(f"{cps0:.1f}", stile_tabella_testo), Paragraph(f"{rDose0/1e3:.3f}", stile_tabella_testo)],
+        [Paragraph("A 50 cm", stile_tabella_testo), Paragraph(f"{cps50:.1f}", stile_tabella_testo), Paragraph(f"{rDose50/1e3:.3f}", stile_tabella_testo)],
+        [Paragraph("A 1 metro", stile_tabella_testo), Paragraph(f"{cps100:.1f}", stile_tabella_testo), Paragraph(f"{rDose100/1e3:.3f}", stile_tabella_testo)]
     ]
     
     t = Table(dati_tabella, colWidths=[200, 160, 170])
