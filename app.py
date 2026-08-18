@@ -105,7 +105,7 @@ if st.button("CALCOLA RISULTATI", type="primary"):
     st.write(f"**Fondo di riferimento:** {dose_fondo_parete:.2f} nSv/h")
     st.write(f"**Valore max a parete:** {dose_max_parete:.2f} nSv/h")
     st.write(f"**Rateo di dose cabina conducente:** {dose_cabina:.2f} nSv/h")
-    st.write(f"**Rateo di dose a contatto:** **{rDose0:.2f}** nSv/h")
+    st.write(f"**Rateo di dose a contatto:** **{rDose0:.0f}** nSv/h")
     st.write(f"**Rateo di dose a 50 cm:** {rDose50:.2f} nSv/h")
     st.write(f"**Rateo di dose a 1 metro:** {rDose100:.2f} nSv/h")
     st.write(f"**Massa del reperto:** {massa:.2f} kg")
