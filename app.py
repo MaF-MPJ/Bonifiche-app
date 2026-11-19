@@ -26,8 +26,8 @@ st.set_page_config(page_title="Radioprotezione App", page_icon="☢️", layout=
 st.title("☢️ Bonifiche MPJ")
 
 # Elenchi strumentazione e tecnici
-detectors = ["RE-55916", "RE-53065", "RE-53154", "RE-53049", "RE-55049", "RE-54722", "RE-56510", "RE-52083PD", "T98-3822", "T98-3914", "T98-8043", "Default"]
-taratura = [0.577, 0.631, 0.613, 0.609, 0.588, 0.598, 0.667, 0.514, 0.612, 0.523, 0.523, 0.602]
+detectors = ["RE-52178", "RE-55916", "RE-53065", "RE-53154", "RE-53049", "RE-55049", "RE-54722", "RE-56510", "RE-52083PD", "T98-3822", "T98-3914", "T98-8043", "Default"]
+taratura = [0.627 0.577, 0.631, 0.613, 0.609, 0.588, 0.598, 0.667, 0.514, 0.612, 0.523, 0.523, 0.602]
 
 # Lista dei tecnici (puoi modificare i nomi all'interno di questo array)
 tecnici = ["Andrea Colli", "Andrea Giliberto", "Davide Concion", "Paolo Riondato", "Stefano Bignolini", "Altro / Operatore"]
